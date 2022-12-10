@@ -1,6 +1,5 @@
 <?php 
 
-
     class Database {
         private $db;
 
@@ -30,6 +29,42 @@
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC);
         }
+
+        function getUserByEmailAndPassword($email, $password) {
+            $stmt = $this->db->prepare("SELECT * FROM users WHERE email='".$email. "' AND password='".$password."'");
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        function createUser($name, $email, $password) {
+            $stmt = $this->db->prepare("INSERT INTO users (name, email, password, created_at) VALUES ( :name, :email, :password, Now())");
+            $result = $stmt->execute(
+                array(
+                    ':name' => $name,
+                    ':email' => $email,
+                    ':password' => $password
+                )
+            );
+          
+            return $result;
+        }
+
+        function createPost($user, $title, $summary, $content, $cover, $category) {
+            $stmt = $this->db->prepare("INSERT INTO posts (title, summary, content, created_at, cover, id_users, id_categories) VALUES ( :title, :summary, :content, Now(), :cover, :id_users, :id_categories)");
+            $result = $stmt->execute(
+                array(
+                    ':title' => $title,
+                    ':summary' => $summary,
+                    ':content' => $content,
+                    ':cover' => $cover,
+                    ':id_users' => $user,
+                    ':id_categories' => $category,
+                )
+            );
+          
+            return $result;
+        }
+        
     }
 
 
