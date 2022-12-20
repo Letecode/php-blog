@@ -10,7 +10,12 @@
     include_once 'api/database.php';
 
     $db = new Database();
-    $posts = $db->getPosts();
+    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+    $perpage = 2;
+    $count = count($db->getPosts()); 
+    $pages = round($count / $perpage);
+    $start = ($currentPage - 1 ) *  $perpage;
+    $posts = $db->getPostsWithPagination($perpage, $start);
     $user = $db->getUser($userId);
 
 ?>
@@ -85,7 +90,7 @@
                             <td><img src="<?php echo $post['cover']; ?>" alt="image" width="100px"></td>
                             <td><?php echo $post['title']; ?></td>
                             <td><?php echo $post['summary']; ?></td>
-                            <td><?php echo substr($post['content'], 0, 100); ?></td>
+                            <td><?php echo substr($post['content'], 0, 10); ?></td>
                             <td>
                                 <a href="edit.php?id=<?php echo $post['id']; ?>" class="btn btn-warning">Modifier</a>
                                 <form action="api/delete.php" method="POST">
@@ -100,9 +105,19 @@
                 </tbody>
             </table>
               
-
-
-
+            <div class="d-flex justify-content-between mb-4">
+                <?php 
+                if(isset($_GET['page']) and $_GET['page'] != $pages and $currentPage > 1) { ?>
+                    <a class="btn btn-primary text-uppercase" href="?page=<?php echo $currentPage - 1; ?>"><- Precedent</a>
+                <?php }
+                
+                if(!(isset($_GET['page']) and $_GET['page'] == $pages)) { ?>
+                    <a class="btn btn-primary text-uppercase" href="?page=<?php echo $currentPage + 1; ?>">Suivant →</a>
+                <?php } else { ?>
+                    <a class="btn btn-primary text-uppercase" href="?page=<?php echo $currentPage - 1; ?>"><- Precedent</a>
+                    
+                <?php }?>
+            </div>
 
              <!-- modal add apprenant -->
         <div class="modal fade" id="modaladd" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

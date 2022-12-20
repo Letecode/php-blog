@@ -11,7 +11,16 @@
         }
 
         function getPosts() {
-            $stmt = $this->db->prepare("SELECT * FROM posts");
+            $stmt = $this->db->prepare("SELECT * FROM posts ORDER BY created_at DESC ");
+            $stmt->execute();
+
+            return $stmt->fetchAll();
+        }
+
+        function getPostsWithPagination($limit, $start) {
+            
+
+            $stmt = $this->db->prepare("SELECT * FROM posts ORDER BY created_at DESC limit ".$start . ",".$limit);
             $stmt->execute();
 
             return $stmt->fetchAll();

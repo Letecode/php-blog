@@ -1,9 +1,15 @@
 <?php 
+    session_start();
 
     include_once 'api/database.php';
 
     $db = new Database();
-    $posts = $db->getPosts();
+    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+    $perpage = 2;
+    $count = count($db->getPosts()); 
+    $pages = round($count / $perpage);
+    $start = ($currentPage - 1 ) *  $perpage;
+    $posts = $db->getPostsWithPagination($perpage, $start);
 
 ?>
 
@@ -58,7 +64,7 @@
                             <div class="post-preview">
                                 <a href="post.php?article_id=<?php echo $post['id']; ?>">
                                     <img src="<?php echo $post['cover']; ?>" alt="" class="img-fluid rounded">
-                                    <h2 class="post-title"><?php echo $post['title']; ?></h2>
+                                    <h2 class="post-title"><?php echo $post['id'].' - '. $post['title']; ?></h2>
                                     <h3 class="post-subtitle"><?php echo $post['summary']; ?></h3>
                                 </a>
                                 <p class="post-meta">
@@ -76,7 +82,19 @@
                   
 
                     <!-- Pager-->
-                    <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a></div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <?php 
+                        if(isset($_GET['page']) and $_GET['page'] != $pages and $currentPage > 1) { ?>
+                            <a class="btn btn-primary text-uppercase" href="?page=<?php echo $currentPage - 1; ?>"><- Precedent</a>
+                        <?php }
+                        
+                        if(!(isset($_GET['page']) and $_GET['page'] == $pages)) { ?>
+                            <a class="btn btn-primary text-uppercase" href="?page=<?php echo $currentPage + 1; ?>">Suivant →</a>
+                        <?php } else { ?>
+                            <a class="btn btn-primary text-uppercase" href="?page=<?php echo $currentPage - 1; ?>"><- Precedent</a>
+                            
+                        <?php }?>
+                    </div>
                 </div>
             </div>
         </div>
